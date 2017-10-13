@@ -1,0 +1,4 @@
+INFO: [VRFC 10-163] Analyzing VHDL file "C:/Users/Kevin/Downloads/CPE 350 Capstone/BasysAES.srcs/sources_1/new/Encryption.vhd" into library xil_defaultlib
+INFO: [VRFC 10-307] analyzing entity Encryption
+INFO: [VRFC 10-163] Analyzing VHDL file "C:/Users/Kevin/Downloads/CPE 350 Capstone/BasysAES.srcs/sources_1/new/main.vhd" into library xil_defaultlib
+INFO: [VRFC 10-307] analyzing entity main
