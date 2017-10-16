@@ -33,26 +33,40 @@ use IEEE.math_real.all;
 
 entity Decryption is
   Port (clk : in std_logic;
-        input  : in integer;
+        input  : in integer ;
         output : out integer);
 end Decryption;
 
 architecture Behavioral of Decryption is
 
-    constant varE : integer := 9;
-    constant varD : integer := 137;
-    constant varN : integer := 667;
-    constant varR : integer := 616;
-    
+    constant varD : integer := 449;
+    constant varN : integer := 9797;  -- 5 * 3
+    constant varR : integer := 9600;
     signal x : integer;
-
+    
+    component PowerMod is
+    Port (base   : in integer;
+          exp    : in integer;
+          modder : in integer;
+          result : out integer);
+    end component;
+    
 begin
-    process(clk, input)
+
+    PowerMod1 : PowerMod
+    port map(base => input,
+             exp => varD,
+             modder => varN,
+             result => x);
+
+    process(clk, input, x)
+    
     begin
-        if(rising_edge(clk)) then
-            x <= input**varE;
-            output <= x mod varN;
-        end if;
+        output <= x;
+--        if(rising_edge(clk)) then
+--            x <= input * input * input; -- raise to 3
+--            output <= x mod 15;
+--        end if;
     end process;   
 
 end Behavioral;

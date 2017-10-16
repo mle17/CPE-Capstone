@@ -42,10 +42,11 @@ end main;
 
 architecture Behavioral of main is
 
-    constant HARD_INPUT : integer := 3;
-    constant EXPECTED_OUTPUT : integer := 12;
+    constant HARD_INPUT : integer := 123;
+    constant EXPECTED_OUTPUT : integer := 5275;
     
     signal encrypt  : integer;
+    signal decrypt  : integer;
     signal slow     : std_logic;
     
     component CLK_DIV_FS is
@@ -75,20 +76,24 @@ begin
     port map(clk => CLK_IN,
              input => HARD_INPUT,
              output => encrypt);
+
+    DECRYPTION1 : Decryption
+    port map(clk => CLK_IN,
+             input => encrypt,
+             output => decrypt);
     
-    process(encrypt, button)
+    process(encrypt, decrypt, button)
     begin
         if (button = '1') then
             correct_en <= '0';
-            correct_de <= '1';
+            correct_de <= '0';
         else
             if (encrypt = EXPECTED_OUTPUT) then
                 correct_en <= '1';
             end if;
-            correct_de <= '0';
---            if decrypt = HARD_INPUT then
---                correct_de <= '0';
---            end if;
+            if (decrypt = HARD_INPUT) then
+                correct_de <= '1';
+            end if;
         end if;
     end process;
     
