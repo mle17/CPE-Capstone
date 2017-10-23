@@ -265,7 +265,7 @@ def polling_method():
 
 ## Define VISA Resource Manager & Install directory
 ## This directory will need to be changed if VISA was installed somewhere else.
-rm = visa.ResourceManager('C:\\Windows\\System32\\visa32.dll') # this uses PyVisa
+rm = visa.ResourceManager() # this uses PyVisa
 ## This is more or less ok too: rm = visa.ResourceManager('C:\\Program Files (x86)\\IVI Foundation\\VISA\\WinNT\\agvisa\\agbin\\visa32.dll')
 ## In fact, it is generally not needed to call it explicitly: rm = visa.ResourceManager()
 
