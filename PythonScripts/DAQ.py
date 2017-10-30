@@ -19,18 +19,25 @@ def main():
     osc_daq = init_osc()
 
     results = pd.DataFrame()
+    osc_daq.write(":RUN")
     
-    while True:
+    for _ in range(10):
+        data = {}
+        
         osc_daq.write("MEASURE:FREQ? ")  # have DAQ read in data
-        Freq = float(osc_daq.read())          # record data DAQ acquired
+        data["Freq"] = float(osc_daq.read())          # record data DAQ acquired
+
         osc_daq.write("MEASURE:VPP? ")
-        Vout = float(osc_daq.read())
-        print(str(Freq) + " Hz\t" + str(Vout) + " V")
-        #osc_daq.clear()
+        data["Vpp"] = float(osc_daq.read())
+
+        print(str(data["Freq"]) + " Hz\t" + str(data["Vpp"]) + " V")
+        results = results.append(data, ignore_index=True)
         time.sleep(1)
-        if(Freq > 1 * MHZ):
+
+        if(data["Freq"] > 1 * MHZ):
            osc_daq.write(":AUTOSCALE")
 
+    print(results)
 
 ##############################################################################################################################################################################
 ##############################################################################################################################################################################
