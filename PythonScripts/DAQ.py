@@ -7,7 +7,7 @@ SCOPE_VISA_ADDR = "USB0::0x0957::0x1797::MY55140223::0::INSTR"
 GLOBAL_TOUT = 10000
 TIME_TO_TRIGGER = 10
 TIME_BTWN_TRIGGERS = 0.025
-
+MHZ = 1e6
 
 ##############################################################################################################################################################################
 ##############################################################################################################################################################################
@@ -22,13 +22,14 @@ def main():
     
     while True:
         osc_daq.write("MEASURE:FREQ? ")  # have DAQ read in data
-        Vout = float(osc_daq.read())          # record data DAQ acquired
-        print(str(Vout) + " Hz")
+        Freq = float(osc_daq.read())          # record data DAQ acquired
+        osc_daq.write("MEASURE:VPP? ")
+        Vout = float(osc_daq.read())
+        print(str(Freq) + " Hz\t" + str(Vout) + " V")
         #osc_daq.clear()
         time.sleep(1)
-
-
-        osc_daq.write(":AUTOSCALE")
+        if(Freq > 1 * MHZ):
+           osc_daq.write(":AUTOSCALE")
 
 
 ##############################################################################################################################################################################
