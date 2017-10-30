@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import visa, time
 
-SCOPE_VISA_ADDR = "USB0::0x0957::0x1797::MY55460257::INSTR"
+SCOPE_VISA_ADDR = "USB0::0x0957::0x1797::MY55140223::0::INSTR"
 
 GLOBAL_TOUT = 10000
 TIME_TO_TRIGGER = 10
@@ -15,18 +15,20 @@ TIME_BTWN_TRIGGERS = 0.025
 ##############################################################################################################################################################################
 ##############################################################################################################################################################################
 
-osc_daq = init_osc()
+def main():
+    osc_daq = init_osc()
 
-# osc_daq = visa.instrument("USB0::0x0957::0x1797::MY55140223::0::INSTR")
-# power_supply = visa.instrument("[Insert port and protocol]")
+    results = pd.DataFrame()
+    
+    while True:
+        osc_daq.write("MEASURE:FREQ? ")  # have DAQ read in data
+        Vout = float(osc_daq.read())          # record data DAQ acquired
+        print(str(Vout) + " Hz")
+        #osc_daq.clear()
+        time.sleep(1)
 
-results = pd.DataFrame()
 
-# while True:
-#     osc_daq.write("MEASURE:VBASE? ")  # have DAQ read in data
-#     Vout = float(daq.read())                    # record data DAQ acquired
-#     print(Vout)
-#     time.sleep(1)
+        osc_daq.write(":AUTOSCALE")
 
 
 ##############################################################################################################################################################################
@@ -42,11 +44,11 @@ def init_osc():
     try:
         scope = rm.open_resource(SCOPE_VISA_ADDR)
     except Exception:
-        print "Unable to connect to oscilloscope at " + str(SCOPE_VISA_ADDRESS) + ". Aborting script.\n"
+        print("Unable to connect to oscilloscope at " + str(SCOPE_VISA_ADDR) + ". Aborting script.\n")
         sys.exit()
 
-    print(scope.query("*IDN?")) # what are you?
-    print(scope.resource_info) # oscilloscope information
+    # print(scope.query("*IDN?")) # what are you?
+    # print(scope.resource_info) # oscilloscope information
 
     ## Set Global Timeout
     ## This can be used wherever, but local timeouts are used for Arming, Triggering, and Finishing the acquisition... Thus it mostly handles IO timeouts
@@ -76,13 +78,13 @@ def blocking_method():
         ## Note that this is a property of the device interface, KsInfiniiVisionX.
 	## If doing repeated acquisitions, this should be done BEFORE the loop, and changed again after the loop if the goal is to achieve best throughput.
 
-    print "Acquiring signal(s)...\n"
+    print("Acquiring signal(s)...\n")
     try: # Set up a try/except block to catch a possible timeout and exit.
         KsInfiniiVisionX.query(":DIGitize;*OPC?") # Acquire the signal(s) with :DIGItize (blocking) and wait until *OPC? comes back with a one. There is no need to issue a *CLS before issuing the :DIGitize command as :DIGitize actually takes care of this for you.
-        print "Signal acquired.\n"
+        print("Signal acquired.\n")
         KsInfiniiVisionX.timeout =  GLOBAL_TOUT # Reset timeout back to what it was, GLOBAL_TOUT.
     except Exception: # Catch a possible timeout and exit.
-        print "The acquisition timed out, most likely due to no trigger, or improper setup causing no trigger. Properly closing scope connection and exiting script.\n"
+        print("The acquisition timed out, most likely due to no trigger, or improper setup causing no trigger. Properly closing scope connection and exiting script.\n")
         KsInfiniiVisionX.clear() # Clear scope communications interface; a device clear aborts a digitize and clears the scope's IO interface..
         ## Don't do a *CLS.  If you do, you won't be able to do a meaningful :SYSTem:ERRor? query as *CLS clears the error queue
         KsInfiniiVisionX.close() # Close communications interface to scope
@@ -148,7 +150,7 @@ def polling_method():
         ## The registers are binary and start counting at zero, thus the 4th bit (4th position in a binary representation of decimal 8 = 2^3 = (1 left shift 3).
         ## This is either High (running = 8) or low (stopped and therefore done with acquisition = 0).
 
-    print "Acquiring signal(s)...\n"
+    print("Acquiring signal(s)...\n")
     StartTime = time.clock() # Define acquisition start time; This is in seconds.
     KsInfiniiVisionX.write("*CLS;:SINGle") # Beigin Acquisition with *CLS and the non-blocking :SINGle command, concatenated together. The *CLS clears all (non-mask) registers & sets them to 0;
 
@@ -173,12 +175,12 @@ def polling_method():
         ## Loop exits when Acq_State != NOT_DONE, that is, it exits the loop when it is DONE or if the max wait time is exceeded.
 
     if Acq_State == ACQ_DONE: # Acquisition fully completed
-        print "Signal acquired.\n"
+        print("Signal acquired.\n")
     else: # Acquisition failed for some reason
-        print "Max wait time exceeded."
-        print "This happens if there was no trigger event."
-        print "Adjust settings accordingly.\n"
-        print "Properly closing scope connection and exiting script.\n"
+        print("Max wait time exceeded.")
+        print("This happens if there was no trigger event.")
+        print("Adjust settings accordingly.\n")
+        print("Properly closing scope connection and exiting script.\n")
         KsInfiniiVisionX.clear() # Clear scope communications interface
         KsInfiniiVisionX.query(":STOP;*OPC?") # Stop the scope
         KsInfiniiVisionX.close() # Close communications interface to scope
@@ -227,3 +229,5 @@ def polling_method():
     ## Note that with this method using :SINGle, for InfiniiVision-X scopes only, :SINGle itself forces the trigger sweep mode into NORMal.
         ## This does not happen with the blocking method, using :DIGitize or on the InfiniiVsion notXs.
 
+if __name__== "__main__":
+    main()
