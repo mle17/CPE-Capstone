@@ -71,6 +71,21 @@ def init_osc():
 
     return scope
 
+def do_command(command, scope, hide_params=False):
+    if hide_params:
+        (header, data) = string.split(command, " ", 1)
+    if debug:
+        print("\nCmd = '%s'" % header)
+    else:
+        if debug:
+            print("\nCmd = '%s'" % command)
+            
+    scope.write("%s\n" % command)
+    if hide_params:
+        check_instrument_errors(header)
+    else:
+        check_instrument_errors(command)
+
 # Random crap from source file
 ##############################################################################################################################################################################
 ##############################################################################################################################################################################
