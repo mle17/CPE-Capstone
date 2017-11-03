@@ -1,8 +1,9 @@
 import numpy as np
 import pandas as pd
 import visa, time
+import struct
 
-SCOPE_VISA_ADDR = "USB0::0x0957::0x1797::MY55140223::0::INSTR"
+SCOPE_VISA_ADDR = "USB0::0x0957::0x1797::MY55460257::0::INSTR"
 
 GLOBAL_TOUT = 10000
 TIME_TO_TRIGGER = 10
@@ -36,6 +37,20 @@ def main():
 
         if(data["Freq"] > 1 * MHZ):
            osc_daq.write(":AUTOSCALE")
+
+##        osc_daq.write(":WAVeform:POINts:MODE RAW")
+##
+##        osc_daq.write(":WAVeform:POINts 100")
+##
+##        osc_daq.write(":WAVeform:SOURce CHANnel1")
+##
+##        osc_daq.write(":WAVeform:POINts:FORMat BYTE")
+##        
+##        sData = do_query_string(":WAVeform:DATA?", osc_daq)
+##        results = get_definite_length_block_data(sData)
+##
+##        values = struct.unpack("%dB" % len(sData), sData)
+##        print(values)
 
     print(results)
 
@@ -74,11 +89,6 @@ def init_osc():
 def do_command(command, scope, hide_params=False):
     if hide_params:
         (header, data) = string.split(command, " ", 1)
-    if debug:
-        print("\nCmd = '%s'" % header)
-    else:
-        if debug:
-            print("\nCmd = '%s'" % command)
             
     scope.write("%s\n" % command)
     if hide_params:
@@ -251,6 +261,60 @@ def polling_method():
                 ## thus the CONDITION register is used.
     ## Note that with this method using :SINGle, for InfiniiVision-X scopes only, :SINGle itself forces the trigger sweep mode into NORMal.
         ## This does not happen with the blocking method, using :DIGitize or on the InfiniiVsion notXs.
+
+# =========================================================
+# Send a query, check for errors, return string:
+# =========================================================
+def do_query_string(query, InfiniiVision):
+   result = InfiniiVision.ask("%s\n" % query)
+   check_instrument_errors(query, InfiniiVision)
+   return result
+
+# =========================================================
+# Send a query, check for errors, return values:
+# =========================================================
+def do_query_values(query, InfiniiVision):
+   results = InfiniiVision.ask_for_values("%s\n" % query)
+   check_instrument_errors(query, InfiniiVision)
+   return results
+
+# =========================================================
+# Check for instrument errors:
+# =========================================================
+def check_instrument_errors(command, InfiniiVision):
+   while True:
+      error_string = InfiniiVision.ask(":SYSTem:ERRor?\n")
+      if error_string: # If there is an error string value.
+         if error_string.find("+0,", 0, 3) == -1: # Not "No error".
+            print("ERROR: %s, command: '%s'" % (error_string, command))
+            print("Exited because of error.")
+            sys.exit(1)
+         else: # "No error"
+            break
+      else: # :SYSTem:ERRor? should always return string.
+         print ("ERROR: :SYSTem:ERRor? returned nothing, command: '%s'" % command)
+         print ("Exited because of error.")
+         sys.exit(1)
+
+# =========================================================
+# Returns data from definite-length block.
+# =========================================================
+def get_definite_length_block_data(sBlock):
+
+   # First character should be "#".
+   pound = sBlock[0:1]
+   if pound != "#":
+      print("PROBLEM: Invalid binary block format, pound char is '%s'." % pound)
+      print("Exited because of problem.")
+      sys.exit(1)
+
+   # Second character is number of following digits for length value.
+   digits = sBlock[1:2]
+
+   # Get the data out of the block and return it.
+   sData = sBlock[int(digits) + 2:]
+   
+   return sData
 
 if __name__== "__main__":
     main()
