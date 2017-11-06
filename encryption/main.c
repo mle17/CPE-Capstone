@@ -8,7 +8,7 @@
  */
 
 
-int PowerMod (int x , int p, int N){
+int PowerMod(int x , int p, int N) {
     int A = 1;
     int m = p;
     int t = x;
@@ -28,30 +28,35 @@ int PowerMod (int x , int p, int N){
 }
 
 
-void main(void)
-{
-	WDT_A->CTL = WDT_A_CTL_PW | WDT_A_CTL_HOLD;		// stop watchdog timer
+void main(void) {
+    WDT_A->CTL = WDT_A_CTL_PW | WDT_A_CTL_HOLD;     // stop watchdog timer
 
-	const int HARD_INPUT = 123;
-	// const int EXPECTED_OUTPUT = 5275;
+    const int HARD_INPUT = 123;
+    const int EXPECTED_OUTPUT = 5275;
 
-	const int varE = 449;
-	const int varN = 9797;
-	// const int varR = 9600;
+    const int varE = 449;
+    const int varN = 9797;
+    // const int varR = 9600;
+    int freq = FREQ_24_MHz;
+    int encrypt, decrypt;
 
-	printf("%d\n",PowerMod( HARD_INPUT, varE, varN ));
+    P2->SEL1 &= ~BIT1;
+    P2->SEL0 &= ~BIT1;
+    P2->DIR |= BIT1;
 
-	int freq = FREQ_24_MHz;
-	P2->SEL1 &= ~2;
-	P2->SEL0 &= ~2;
-	P2->DIR |= 2;
+    set_DCO(freq);
 
-	while( 1 ){
-	    P2->OUT |= 2;
-	    delayNs(5000, freq);
-	    P2->OUT &= ~2;
-	    delayNs(5000,freq);
+    encrypt = PowerMod(HARD_INPUT, varE, varN);
+    decrypt = PowerMod(encrypt, varE, varN);
 
-	}
+    printf("Encrypted : %d, Expected : %d\n", encrypt, EXPECTED_OUTPUT);
+    printf("Decrypted : %d, Expected : %d\n", decrypt, HARD_INPUT);
+
+    while(1) {
+        P2->OUT |= BIT1;
+        delayMs(500, freq);
+        P2->OUT &= ~BIT1;
+        delayMs(500,freq);
+
+    }
 }
-
