@@ -44,6 +44,8 @@ void main(void) {
     P2->SEL0 &= ~BIT1;
     P2->DIR |= BIT1;
 
+    P4->SEL1 &= ~BIT2;
+    P4->SEL0 &= ~BIT2;
     P4->DIR |= BIT3;
     P4->OUT &= ~BIT3;
 
