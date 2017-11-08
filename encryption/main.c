@@ -44,19 +44,25 @@ void main(void) {
     P2->SEL0 &= ~BIT1;
     P2->DIR |= BIT1;
 
+    P4->DIR |= BIT3;
+    P4->OUT &= ~BIT3;
+
     set_DCO(freq);
 
     encrypt = PowerMod(HARD_INPUT, varE, varN);
     decrypt = PowerMod(encrypt, varE, varN);
 
-    printf("Encrypted : %d, Expected : %d\n", encrypt, EXPECTED_OUTPUT);
-    printf("Decrypted : %d, Expected : %d\n", decrypt, HARD_INPUT);
+//    printf("Encrypted : %d, Expected : %d\n", encrypt, EXPECTED_OUTPUT);
+//    printf("Decrypted : %d, Expected : %d\n", decrypt, HARD_INPUT);
 
     while(1) {
-        P2->OUT |= BIT1;
         delayMs(500, freq);
+        P2->OUT |= BIT1;
+        encrypt = PowerMod(HARD_INPUT, varE, varN);
+        // printf("Encrypted : %d, Expected : %d\n", encrypt, EXPECTED_OUTPUT);
         P2->OUT &= ~BIT1;
-        delayMs(500,freq);
+        encrypt = 0;
+        // printf("Reset\n");
 
     }
 }
