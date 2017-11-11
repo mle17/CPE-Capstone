@@ -23,35 +23,36 @@ def main():
     results = pd.DataFrame()
     osc_daq.write(":RUN")
 
-    for _ in range(10):
-        data = {}
+    for _ in range(1):
+        # data = {}
 
-        osc_daq.write("MEASURE:FREQ? ")             # have DAQ read in data
-        data["Freq"] = float(osc_daq.read())        # record data DAQ acquired
+        # osc_daq.write("MEASURE:FREQ? ")             # have DAQ read in data
+        # data["Freq"] = float(osc_daq.read())        # record data DAQ acquired
 
-        osc_daq.write("MEASURE:VPP? ")
-        data["Vpp"] = float(osc_daq.read())
+        # osc_daq.write("MEASURE:VPP? ")
+        # data["Vpp"] = float(osc_daq.read())
 
-        print(str(data["Freq"]) + " Hz\t" + str(data["Vpp"]) + " V")
-        results = results.append(data, ignore_index=True)
-        time.sleep(1)
+        # print(str(data["Freq"]) + " Hz\t" + str(data["Vpp"]) + " V")
+        # results = results.append(data, ignore_index=True)
+        # time.sleep(1)
 
-        if(data["Freq"] > 1 * MHZ):
-           osc_daq.write(":AUTOSCALE")
+        # if(data["Freq"] > 1 * MHZ):
+        #    osc_daq.write(":AUTOSCALE")
 
-##        osc_daq.write(":WAVeform:POINts:MODE RAW")
-##
-##        osc_daq.write(":WAVeform:POINts 100")
-##
-##        osc_daq.write(":WAVeform:SOURce CHANnel1")
-##
-##        osc_daq.write(":WAVeform:POINts:FORMat BYTE")
-##
-##        sData = do_query_string(":WAVeform:DATA?", osc_daq)
-##        results = get_definite_length_block_data(sData)
-##
-##        values = struct.unpack("%dB" % len(sData), sData)
-##        print(values)
+       osc_daq.write(":WAVeform:POINts:MODE RAW")
+       print(osc_daq.query(":WAVeform:POINts:MODE?"))
+
+       osc_daq.write(":WAVeform:POINts 100")
+
+       osc_daq.write(":WAVeform:SOURce CHANnel1")
+
+       osc_daq.write(":WAVeform:POINts:FORMat BYTE")
+
+       sData = do_query_string(":WAVeform:DATA?", osc_daq)
+       results = get_definite_length_block_data(sData)
+
+       values = struct.unpack("%dB" % len(sData), sData)
+       print(values)
 
     print(results)
 
