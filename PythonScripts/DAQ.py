@@ -40,13 +40,16 @@ def main():
         #    osc_daq.write(":AUTOSCALE")
 
        osc_daq.write(":WAVeform:POINts:MODE RAW")
-       print(osc_daq.query(":WAVeform:POINts:MODE?"))
+       print(do_query_string(":WAVeform:POINts:MODE?", osc_daq))
 
        osc_daq.write(":WAVeform:POINts 100")
+       print(do_query_string(":WAVeform:POINts?", osc_daq))
 
        osc_daq.write(":WAVeform:SOURce CHANnel1")
+       print(do_query_string(":WAVeform:SOURce?", osc_daq))
 
        osc_daq.write(":WAVeform:POINts:FORMat BYTE")
+       print(do_query_string(":WAVeform:POINts:FORMat?", osc_daq))
 
        sData = do_query_string(":WAVeform:DATA?", osc_daq)
        results = get_definite_length_block_data(sData)
@@ -268,7 +271,7 @@ def polling_method():
 # Send a query, check for errors, return string:
 # =========================================================
 def do_query_string(query, InfiniiVision):
-   result = InfiniiVision.ask("%s\n" % query)
+   result = InfiniiVision.query("%s\n" % query)
    check_instrument_errors(query, InfiniiVision)
    return result
 
@@ -285,7 +288,7 @@ def do_query_values(query, InfiniiVision):
 # =========================================================
 def check_instrument_errors(command, InfiniiVision):
    while True:
-      error_string = InfiniiVision.ask(":SYSTem:ERRor?\n")
+      error_string = InfiniiVision.query(":SYSTem:ERRor?\n")
       if error_string: # If there is an error string value.
          if error_string.find("+0,", 0, 3) == -1: # Not "No error".
             print("ERROR: %s, command: '%s'" % (error_string, command))
