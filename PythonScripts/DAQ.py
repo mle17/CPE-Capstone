@@ -40,18 +40,19 @@ def main():
         #    osc_daq.write(":AUTOSCALE")
 
        osc_daq.write(":WAVeform:POINts:MODE RAW")
-       print(do_query_string(":WAVeform:POINts:MODE?", osc_daq))
+       print(osc_daq.query(":WAVeform:POINts:MODE?"))
 
        osc_daq.write(":WAVeform:POINts 100")
-       print(do_query_string(":WAVeform:POINts?", osc_daq))
+       print(osc_daq.query(":WAVeform:POINts?"))
 
        osc_daq.write(":WAVeform:SOURce CHANnel1")
-       print(do_query_string(":WAVeform:SOURce?", osc_daq))
+       print(osc_daq.query(":WAVeform:SOURce?"))
 
-       osc_daq.write(":WAVeform:POINts:FORMat BYTE")
-       print(do_query_string(":WAVeform:POINts:FORMat?", osc_daq))
+       osc_daq.write(":WAVeform:FORMat ASCII")
+       print(osc_daq.query(":WAVeform:FORMat?"))
 
-       sData = do_query_string(":WAVeform:DATA?", osc_daq)
+       sData = osc_daq.query(":WAVeform:DATA?")
+       print(sData)
        results = get_definite_length_block_data(sData)
 
        values = struct.unpack("%dB" % len(sData), sData)
