@@ -1,9 +1,10 @@
 import numpy as np
 import pandas as pd
 import visa, time
+import sys
 import struct
 
-SCOPE_VISA_ADDR = "USB0::0x0957::0x1797::MY55460257::0::INSTR"
+SCOPE_VISA_ADDR = "USB0::0x0957::0x17A9::MY50514917::0::INSTR"
 
 GLOBAL_TOUT = 10000
 TIME_TO_TRIGGER = 10
@@ -21,12 +22,12 @@ def main():
 
     results = pd.DataFrame()
     osc_daq.write(":RUN")
-    
+
     for _ in range(10):
         data = {}
-        
-        osc_daq.write("MEASURE:FREQ? ")  # have DAQ read in data
-        data["Freq"] = float(osc_daq.read())          # record data DAQ acquired
+
+        osc_daq.write("MEASURE:FREQ? ")             # have DAQ read in data
+        data["Freq"] = float(osc_daq.read())        # record data DAQ acquired
 
         osc_daq.write("MEASURE:VPP? ")
         data["Vpp"] = float(osc_daq.read())
@@ -45,7 +46,7 @@ def main():
 ##        osc_daq.write(":WAVeform:SOURce CHANnel1")
 ##
 ##        osc_daq.write(":WAVeform:POINts:FORMat BYTE")
-##        
+##
 ##        sData = do_query_string(":WAVeform:DATA?", osc_daq)
 ##        results = get_definite_length_block_data(sData)
 ##
@@ -70,8 +71,8 @@ def init_osc():
         print("Unable to connect to oscilloscope at " + str(SCOPE_VISA_ADDR) + ". Aborting script.\n")
         sys.exit()
 
-    # print(scope.query("*IDN?")) # what are you?
-    # print(scope.resource_info) # oscilloscope information
+    print(scope.query("*IDN?")) # what are you?
+    print(scope.resource_info) # oscilloscope information
 
     ## Set Global Timeout
     ## This can be used wherever, but local timeouts are used for Arming, Triggering, and Finishing the acquisition... Thus it mostly handles IO timeouts
@@ -89,7 +90,7 @@ def init_osc():
 def do_command(command, scope, hide_params=False):
     if hide_params:
         (header, data) = string.split(command, " ", 1)
-            
+
     scope.write("%s\n" % command)
     if hide_params:
         check_instrument_errors(header)
@@ -313,7 +314,7 @@ def get_definite_length_block_data(sBlock):
 
    # Get the data out of the block and return it.
    sData = sBlock[int(digits) + 2:]
-   
+
    return sData
 
 if __name__== "__main__":
