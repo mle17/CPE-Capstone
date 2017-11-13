@@ -25,36 +25,36 @@ def main():
     osc_daq.write(":RUN")
 
     for _ in range(1):
-        # data = {}
+        data = {}
 
-        # osc_daq.write("MEASURE:FREQ? ")             # have DAQ read in data
-        # data["Freq"] = float(osc_daq.read())        # record data DAQ acquired
+        osc_daq.write("MEASURE:FREQ? ")             # have DAQ read in data
+        data["Freq"] = float(osc_daq.read())        # record data DAQ acquired
 
-        # osc_daq.write("MEASURE:VPP? ")
-        # data["Vpp"] = float(osc_daq.read())
+        osc_daq.write("MEASURE:VPP? ")
+        data["Vpp"] = float(osc_daq.read())
 
-        # print(str(data["Freq"]) + " Hz\t" + str(data["Vpp"]) + " V")
-        # results = results.append(data, ignore_index=True)
-        # time.sleep(1)
+        print(str(data["Freq"]) + " Hz\t" + str(data["Vpp"]) + " V")
+        results = results.append(data, ignore_index=True)
+        time.sleep(1)
 
-        # if(data["Freq"] > 1 * MHZ):
-        #    osc_daq.write(":AUTOSCALE")
+        if(data["Freq"] > 1 * MHZ):
+           osc_daq.write(":AUTOSCALE")
 
-       osc_daq.write(":WAVeform:POINts:MODE RAW")
-       print(osc_daq.query(":WAVeform:POINts:MODE?"))
+        osc_daq.write(":WAVeform:POINts:MODE RAW")
+        print(osc_daq.query(":WAVeform:POINts:MODE?"))
 
-       osc_daq.write(":WAVeform:POINts 100")
-       print(osc_daq.query(":WAVeform:POINts?"))
+        osc_daq.write(":WAVeform:POINts 100")
+        print(osc_daq.query(":WAVeform:POINts?"))
 
-       osc_daq.write(":WAVeform:SOURce CHANnel1")
-       print(osc_daq.query(":WAVeform:SOURce?"))
+        osc_daq.write(":WAVeform:SOURce CHANnel1")
+        print(osc_daq.query(":WAVeform:SOURce?"))
 
-       osc_daq.write(":WAVeform:FORMat ASCII")
-       print(osc_daq.query(":WAVeform:FORMat?"))
+        osc_daq.write(":WAVeform:FORMat ASCII")
+        print(osc_daq.query(":WAVeform:FORMat?"))
 
-       sData = osc_daq.query(":WAVeform:DATA?")
-    #    print(sData[1])
-       wave_results = get_definite_length_block_data(sData)
+        sData = osc_daq.query(":WAVeform:DATA?")
+        #    print(sData[1])
+        wave_results = get_definite_length_block_data(sData)
 
 
     plt.plot(wave_results)
