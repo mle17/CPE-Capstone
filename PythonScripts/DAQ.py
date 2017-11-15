@@ -24,10 +24,12 @@ def main():
     results = pd.DataFrame()
     osc_daq.write(":RUN")
 
-    for _ in range(1):
-        wave = take_waveform(osc_daq);
+    for _ in range(2):
+        wave = take_waveform(osc_daq)
+        results = results.append(wave)
 
-    plt.plot(wave)
+    print(results)
+    plt.plot(results.iloc[[0]])
     plt.show()
 
 ##############################################################################################################################################################################
@@ -43,8 +45,9 @@ def take_waveform(scope):
   scope.write(":WAVeform:FORMat ASCII")
 
   sData = scope.query(":WAVeform:DATA?")
-  wave_results = get_definite_length_block_data(sData)
-  return wave_results
+  wave_results = format_wave_data(sData)
+  df = pd.DataFrame(wave_results)
+  return df
 
 def init_osc():
     rm = visa.ResourceManager()
@@ -120,7 +123,7 @@ def check_instrument_errors(command, InfiniiVision):
 # =========================================================
 # Returns data from definite-length block.
 # =========================================================
-def get_definite_length_block_data(sBlock):
+def format_wave_data(sBlock):
 
    # First character should be "#".
    pound = sBlock[0:1]
