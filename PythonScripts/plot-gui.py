@@ -10,8 +10,18 @@ from PyQt5.QtCore import pyqtSlot
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
+import pandas as pd
 import random
+import DAQ
 #******************************************************************
+
+osc_daq = DAQ.init_osc()
+overall_df = pd.DataFrame()
+
+def main():
+    app = QApplication(sys.argv)
+    ex = App()
+    sys.exit(app.exec_())
 
 class App(QMainWindow):
 
@@ -21,8 +31,8 @@ class App(QMainWindow):
         self.left = 100
         self.top = 100
         self.title = 'Secure Our System'
-        self.width = 720
-        self.height = 480
+        self.width = 1440
+        self.height = 960
         self.m = self.initUI()
 
     def initUI(self):
@@ -61,11 +71,15 @@ class App(QMainWindow):
     def on_click(self):
         print('PyQt5 button click')
         # put data here
-        self.m.setData([random.random() for i in range(25)])
+        wave_data = DAQ.take_waveform(osc_daq)
+        global overall_df
+        overall_df = overall_df.append(wave_data)
+        self.m.setData(list(wave_data.iloc[0]))
 
     @pyqtSlot()
     def on_save(self):
-        print(self.textbox.text())
+        print(overall_df)
+        overall_df.to_csv(self.textbox.text())
 
 class PlotCanvas(FigureCanvas):
 
@@ -99,6 +113,4 @@ class PlotCanvas(FigureCanvas):
         self.plot(data)
 
 if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    ex = App()
-    sys.exit(app.exec_())
+    main()

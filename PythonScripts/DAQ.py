@@ -25,11 +25,14 @@ def main():
     osc_daq.write(":RUN")
 
     for _ in range(2):
-        wave = take_waveform(osc_daq)
-        results = results.append(wave)
+        wave_data = take_waveform(osc_daq)
+        results = results.append(wave_data)
 
-    print(results)
-    plt.plot(results.iloc[[0]])
+    first_waveform = results.iloc[0]
+    sec_waveform = results.iloc[1]
+    first_waveform.plot(kind="line")
+    sec_waveform.plot(kind="line")
+
     plt.show()
 
 ##############################################################################################################################################################################
@@ -46,7 +49,7 @@ def take_waveform(scope):
 
   sData = scope.query(":WAVeform:DATA?")
   wave_results = format_wave_data(sData)
-  df = pd.DataFrame(wave_results)
+  df = pd.DataFrame([wave_results])
   return df
 
 def init_osc():
