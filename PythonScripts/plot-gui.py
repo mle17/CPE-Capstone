@@ -102,10 +102,10 @@ class PlotCanvas(FigureCanvas):
 
         # data = [random.random() for i in range(25)]
         ax = self.figure.add_subplot(111)
-        ax.set_title('Voltage v Times')
+        ax.set_title('Waveform')
         self.lines = ax.plot(data, 'r-')
-        ax.set_xlabel('List Size Increment')
-        ax.set_ylabel('Time in Second')
+        ax.set_xlabel('Time (ms)')
+        ax.set_ylabel('Voltage (V)')
         self.draw()
 
     def setData(self, data):
