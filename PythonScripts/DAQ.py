@@ -23,6 +23,7 @@ def main():
 
     results = pd.DataFrame()
     osc_daq.write(":RUN")
+    # osc_daq.write(":SINGLE") # acquires one waveform (pg. 790)
 
     for _ in range(2):
         wave_data = take_waveform(osc_daq)
@@ -58,7 +59,8 @@ def init_osc():
     print("Resources: ", resources)
 
     try:
-        scope = rm.open_resource(SCOPE_VISA_ADDR)
+        device_addr = get_device_addr("USB0", resources) ## oscilloscope first address
+        scope = rm.open_resource(device_addr)
     except Exception:
         print("Unable to connect to oscilloscope at " + str(SCOPE_VISA_ADDR) + ". Aborting script.\n")
         sys.exit()
@@ -143,6 +145,13 @@ def format_wave_data(sBlock):
    list_data = sData.split(",")
    list_data = [float(i) for i in list_data]
    return list_data
+
+def get_device_addr(port_type, resource_list):
+    device_addr = ""
+    for device in resource_list:
+        if port_type in device:
+            device_addr = device
+            return device_addr
 
 if __name__== "__main__":
     main()
