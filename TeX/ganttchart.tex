@@ -1,0 +1,65 @@
+\documentclass[tikz]{standalone}
+    \usepackage[utf8]{inputenc}
+    \usepackage{pgfgantt}
+    \usepackage[normalem]{ulem}
+    
+    \def \HolidayStyle {rounded corners=3pt, fill={green!25!black!75}}
+    
+    \begin{document}
+      \begin{ganttchart}[y unit title=0.4cm,
+                         y unit chart=0.5cm,
+                         vgrid,hgrid,
+                         title label anchor/.style={below=-1.6ex},
+                         title left shift=.05,
+                         title right shift=-.05,
+                         title height=1,
+                         bar/.style={fill=gray!50},
+                         incomplete/.style={fill=white},
+                         milestone/.append style={fill=red},
+                         milestone label font=\color{red},
+                         progress label text={},
+                         bar height=0.7,
+                         group right shift=0,
+                         group top shift=.6,
+                         group height=.3,
+                         group peaks height={.2}
+          ]{1}{24}
+          \gantttitle{CPE Capstone 2017 Fall / 2018 Winter}{24} \\
+           
+          \gantttitle{Oct}{4}
+          \gantttitle{Nov}{4}
+          \gantttitle{Dec}{5}
+          \gantttitle{Jan}{4}
+          \gantttitle{Feb}{4}
+          \gantttitle{Mar}{3} \\
+           
+          \gantttitlelist{6, 13, 20, 27}{1}
+          \gantttitlelist{3, 10, 17, 24}{1}
+          \gantttitlelist{1, 8, 15, 22, 29}{1}
+          \gantttitlelist{5, 12, 19, 26}{1}
+          \gantttitlelist{2, 9, 16, 23}{1}
+          \gantttitlelist{2, 9, 16}{1} \\
+           
+          % ENCRYPTION ALG
+          \ganttgroup{Encryption Algorithm}{1}{6} \\
+          \ganttbar{\sout{Implement RSA Encryption Alg on Microprocessor}}{1}{3} \\
+          \ganttlinkedbar{\sout{Probe for any possible leakage points}}{4}{6} \\
+          \ganttlinkedmilestone{\sout{Finish RSA encryption/decryption on microprocessor}}{6} \\
+          
+          % TEST SUITE
+          \ganttgroup{Test Suite}{3}{24} \\
+          \ganttbar{\sout{Interface test equipment with computers}}{3}{4} \\
+          \ganttlinkedmilestone{\sout{Finish initial DAQ script (read data, apply voltage)}}{4}{4} \\
+          \ganttbar{\sout{Interface microprocessor with test script}}{5}{7} \\
+          \ganttlinkedmilestone{\sout{Set up test environment}}{7}{7} \\
+          \ganttbar[bar/.append style={rounded corners=3, fill=green!25!black!75}]{{\color{green!25!black!75}{THANKSGIVING BREAK}}}{8}{8} \\
+          \ganttbar{\sout{Characterize sensors needed}}{9}{9} \\
+          \ganttlinkedmilestone{\sout{Get sensors and controllers}}{9}{9} \\
+          \ganttbar[bar/.append style={rounded corners=3, fill=green!25!black!75}]{\color{green!25!black!75}{WINTER BREAK}}{11}{14} \\
+          \ganttmilestone{Create one test case}{15}{15} \\
+          \ganttbar{Implement machine learning algorithm for analysis automation}{15}{23} \\
+          \ganttbar{Add various SCAs}{15}{23} \\
+          \ganttlinkedmilestone{Finish the project}{24}{24}
+       \end{ganttchart}
+    \end{document}
+    

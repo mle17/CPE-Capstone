@@ -1,0 +1,15 @@
+# Ignore Everything
+*
+
+# Don't ignore following files in root
+!.gitignore
+!.md
+
+# Don't ignore directories to allow recursing through them
+!*/
+
+# Don't ignore these files in said directories
+!*/*.pdf
+!*/*.tex
+!*/*.bib
+!*/*.md
