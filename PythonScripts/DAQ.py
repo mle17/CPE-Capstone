@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 SCOPE_VISA_ADDR = "USB0::0x0957::0x1797::MY55460257::0::INSTR"
 
-GLOBAL_TOUT = 10000
+GLOBAL_TOUT = 10000 # 1000 = 1 second
 TIME_TO_TRIGGER = 10
 TIME_BTWN_TRIGGERS = 0.025
 MHZ = 1e6
@@ -22,7 +22,7 @@ def main():
     osc_daq = init_osc()
 
     results = pd.DataFrame()
-    osc_daq.write(":RUN")
+    # osc_daq.write(":RUN")
     # osc_daq.write(":SINGLE") # acquires one waveform (pg. 790)
 
     for _ in range(2):
@@ -42,7 +42,24 @@ def main():
 ##############################################################################################################################################################################
 ##############################################################################################################################################################################
 def take_waveform(scope):
-  scope.write(":AUTOSCALE")
+  scope.query(":STOP;*CLS;*OPC?")
+  scope.write(":SINGLE")
+
+  i = 0
+  while i <= GLOBAL_TOUT:
+      value = scope.query(":OPERegister:CONDition?")
+      time.sleep(1)
+      i += 1000
+
+      if not (int(value) & 8):
+          break
+
+  # trigger not found
+  if i > GLOBAL_TOUT:
+      print("Trigger not found")
+      return
+
+  # scope.write(":AUTOSCALE")
   scope.write(":WAVeform:POINts:MODE RAW")
   scope.write(":WAVeform:POINts 100")
   scope.write(":WAVeform:SOURce CHANnel1")
@@ -74,6 +91,10 @@ def init_osc():
 
     ## Clear the instrument bus
     scope.clear()
+
+    ## Setup Triggering
+    scope.write(":TRIGGER:MODE EDGE")
+    scope.write(":TRIGger:EDGE:LEVel 2")
 
     ## Clear all registers and errors
     ## Always stop scope when making any changes.
