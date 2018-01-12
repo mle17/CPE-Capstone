@@ -33,7 +33,7 @@ class App(QMainWindow):
         self.title = 'Secure Our System'
         self.width = 1440
         self.height = 960
-        self.is_trigger = True
+        self.is_trigger = False
         self.m = self.initUI()
 
     def initUI(self):
@@ -44,26 +44,33 @@ class App(QMainWindow):
         m = PlotCanvas(self, width=10, height=8)
         m.move(0,0)
 
+        # start button
         button = QPushButton('Start', self)
         button.setToolTip('Start Data Recording')
-        button.move(580,0)
+        button.move(1000,70)
         button.resize(140,100)
         button.clicked.connect(self.on_click)
 
+        # Create save button
+        self.button_save = QPushButton('Save data', self)
+        self.button_save.setToolTip('Sava data as txt file')
+        self.button_save.move(1000,170)
+        self.button_save.resize(140,100)
+
+        self.button_toggle = QPushButton('Toggle Mode', self)
+        self.button_toggle.setToolTip('Toggle trigger mode')
+        self.button_toggle.move(1000,370)
+        self.button_toggle.resize(140,100)
+
         # Create textbox
         self.textbox = QLineEdit(self)
-        self.textbox.move(520, 120)
+        self.textbox.move(850, 170)
         self.textbox.resize(140, 20)
         self.textbox.setPlaceholderText('Enter file name here')
 
-        # Create a button in the window
-        self.button_save = QPushButton('Save data', self)
-        self.button_save.setToolTip('Sava data as txt file')
-        self.button_save.move(520,170)
-        button.resize(140,100)
-
         # connect button to function on_click
         self.button_save.clicked.connect(self.on_save)
+        self.button_toggle.clicked.connect(self.on_switch_mode)
 
         self.show()
         return m
@@ -81,6 +88,12 @@ class App(QMainWindow):
     def on_save(self):
         print(overall_df)
         overall_df.to_csv(self.textbox.text())
+
+    @pyqtSlot()
+    def on_switch_mode(self):
+        self.is_trigger = not self.is_trigger
+        print(self.is_trigger)
+
 
 class PlotCanvas(FigureCanvas):
 
