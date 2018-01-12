@@ -33,6 +33,7 @@ class App(QMainWindow):
         self.title = 'Secure Our System'
         self.width = 1440
         self.height = 960
+        self.is_trigger = True
         self.m = self.initUI()
 
     def initUI(self):
@@ -71,7 +72,7 @@ class App(QMainWindow):
     def on_click(self):
         print('PyQt5 button click')
         # put data here
-        wave_data = DAQ.take_waveform(osc_daq)
+        wave_data = DAQ.take_waveform(osc_daq, self.is_trigger)
         global overall_df
         overall_df = overall_df.append(wave_data)
         self.m.setData(list(wave_data.iloc[0]))

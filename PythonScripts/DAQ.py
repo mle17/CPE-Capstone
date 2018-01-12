@@ -41,25 +41,29 @@ def main():
 ## Helper Functions
 ##############################################################################################################################################################################
 ##############################################################################################################################################################################
-def take_waveform(scope):
+def take_waveform(scope, to_trigger):
   scope.query(":STOP;*CLS;*OPC?")
-  scope.write(":SINGLE")
 
-  i = 0
-  while i <= GLOBAL_TOUT:
-      value = scope.query(":OPERegister:CONDition?")
-      time.sleep(1)
-      i += 1000
+  if to_trigger:
+      scope.write(":SINGLE")
 
-      if not (int(value) & 8):
-          break
+      i = 0
+      while i <= GLOBAL_TOUT:
+          value = scope.query(":OPERegister:CONDition?")
+          time.sleep(1)
+          i += 1000
 
-  # trigger not found
-  if i > GLOBAL_TOUT:
-      print("Trigger not found")
-      return
+          if not (int(value) & 8):
+              break
 
-  # scope.write(":AUTOSCALE")
+      # trigger not found
+      if i > GLOBAL_TOUT:
+          print("Trigger not found")
+          return
+  else:
+      scope.write(":RUN")
+      scope.write(":AUTOSCALE")
+
   scope.write(":WAVeform:POINts:MODE RAW")
   scope.write(":WAVeform:POINts 100")
   scope.write(":WAVeform:SOURce CHANnel1")
@@ -89,6 +93,11 @@ def init_osc():
     ## This can be used wherever, but local timeouts are used for Arming, Triggering, and Finishing the acquisition... Thus it mostly handles IO timeouts
     scope.timeout = GLOBAL_TOUT
 
+    trigger_mode_on(scope)
+
+    return scope
+
+def trigger_mode_on(scope):
     ## Clear the instrument bus
     scope.clear()
 
@@ -99,8 +108,6 @@ def init_osc():
     ## Clear all registers and errors
     ## Always stop scope when making any changes.
     scope.query(":STOP;*CLS;*OPC?")
-
-    return scope
 
 def do_command(command, scope, hide_params=False):
     if hide_params:
