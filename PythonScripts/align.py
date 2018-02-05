@@ -12,19 +12,19 @@ def errorFun(wave1, wave2):
 	for shift in range(-len(wave1) + 1, len(wave1)):
 		error[shift] = 0
 		overlap = 0
-		# TODO: FIX ME
-		for i, j in zip(range(len(wave1)), range(len(wave2) + shift)):
-			print(i,j)
+	#	print("SHIFT HERE: " + str(shift))
+		for i, j in zip(range(len(wave1)), range(shift, len(wave2) + shift)):
+			# print(i,j)
 			if(j < len(wave2) and j >= 0):
-				error[shift] += (wave1[i] - wave2[j]) ** 2
-				# print('Added ' + str((wave1[i] - wave2[j]) ** 2) + ' Now ' + str(error[shift]))
+				error[shift] += (wave2[i] - wave1[j]) ** 2
+			#	print('At time', i,j, 'Added ', wave1[i],  wave2[j],' Now ' + str(error[shift]))
 				overlap += 1
 		if(overlap > 0):
 			error[shift] = error[shift]/overlap
 		else:
 			error[shift] = math.inf
 
-	print(error)
+	#print(error)
 	return error
 
 def main(argv):
@@ -39,7 +39,7 @@ def main(argv):
 	# shift = (np.argmax(signal.correlate(y1, y2)) - len(y1)) * dx
 	err_dict = errorFun(y1, y2)
 	plt.plot(x, y1, x, y2)
-	shift = min(err_dict, key=err_dict.get)
+	shift = min(err_dict, key=err_dict.get) * dx
 	plt.plot(x, y1, x + shift, y2)
 	plt.show()
 
