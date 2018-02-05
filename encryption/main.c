@@ -8,11 +8,13 @@
  */
 
 
-int PowerMod(int x , int p, int N) {
-    int A = 1;
-    int m = p;
-    int t = x;
-    int k ,r;
+const int freq = FREQ_24_MHz;
+
+unsigned long long PowerMod(unsigned long long x , unsigned long long p, unsigned long long N) {
+    unsigned long long A = 1;
+    unsigned long long m = p;
+    unsigned long long t = x;
+    unsigned long long k ,r;
 
     while( m > 0 ){
         k = m / 2;
@@ -20,6 +22,7 @@ int PowerMod(int x , int p, int N) {
         if ( r == 1 ){
             A = (A * t) % N;
         }
+//        delayMs(10, freq);
         t = (t * t) % N;
         m = k;
     }
@@ -27,44 +30,73 @@ int PowerMod(int x , int p, int N) {
     return A;
 }
 
+/*
+/*
+32 bit
+P:2835473779
+
+Q:3154257031
+
+N:8943813103626890149
+
+Mod:1490635516272859890
+
+d:636903973735029413
+
+cipher:1120636163711549706
+123456
+
+16 bit
+P:61627
+
+Q:45757
+
+N:2819866639
+
+Mod:469959876
+
+d:265897313
+
+cipher:1236341142
+123456
+*/
 
 void main(void) {
     WDT_A->CTL = WDT_A_CTL_PW | WDT_A_CTL_HOLD;     // stop watchdog timer
 
-    const int HARD_INPUT = 123;
-    const int EXPECTED_OUTPUT = 5275;
+    const unsigned long long HARD_INPUT = 123456;
+    const unsigned long long EXPECTED_OUTPUT = 1236341142;
 
-    const int varE = 449;
-    const int varN = 9797;
-    // const int varR = 9600;
-    int freq = FREQ_24_MHz;
-    int encrypt, decrypt;
+    const unsigned long long varE = 65537;
+    const unsigned long long varN = 2819866639;
+    const unsigned long long varMod = 469959876;
+    const unsigned long long varD = 265897313;
+    unsigned long long encrypt, decrypt;
 
     P2->SEL1 &= ~BIT1;
     P2->SEL0 &= ~BIT1;
     P2->DIR |= BIT1;
 
-    P4->SEL0 |= BIT3;
-    P4->SEL1 &= ~BIT3;
     P4->DIR |= BIT3;
-
+    P4->OUT &= ~BIT3;
 
     set_DCO(freq);
 
     encrypt = PowerMod(HARD_INPUT, varE, varN);
-    decrypt = PowerMod(encrypt, varE, varN);
+    decrypt = PowerMod(encrypt, varD, varN);
 
-//    printf("Encrypted : %d, Expected : %d\n", encrypt, EXPECTED_OUTPUT);
-//    printf("Decrypted : %d, Expected : %d\n", decrypt, HARD_INPUT);
+//    printf("64 bits? : %d", (int)sizeof(unsigned long long));
+    printf("Encrypted : %d, Expected : %d\n", encrypt, EXPECTED_OUTPUT);
+    printf("Decrypted : %d, Expected : %d\n", decrypt, HARD_INPUT);
 
-    while(1) {
-        delayMs(500, freq);
-        P2->OUT |= BIT1;
-        encrypt = PowerMod(HARD_INPUT, varE, varN);
-        // printf("Encrypted : %d, Expected : %d\n", encrypt, EXPECTED_OUTPUT);
-        P2->OUT &= ~BIT1;
-        encrypt = 0;
-        // printf("Reset\n");
-
-    }
+//    while(1) {
+//        delayMs(500, freq);
+//        P2->OUT |= BIT1;
+//        encrypt = PowerMod(HARD_INPUT, varE, varN);
+//        // printf("Encrypted : %d, Expected : %d\n", encrypt, EXPECTED_OUTPUT);
+//        P2->OUT &= ~BIT1;
+//        encrypt = 0;
+//        // printf("Reset\n");
+//
+//    }
 }
