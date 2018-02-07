@@ -82,6 +82,18 @@ void main(void) {
 
     set_DCO(freq);
 
+    TIMER_A0->CCTL[0] = TIMER_A_CCTLN_CCIE; // TACCR0 interrupt enabled
+    TIMER_A0->CCR[0] = 7500;
+    TIMER_A0->CTL = TIMER_A_CTL_SSEL__SMCLK | // SMCLK, continuous mode
+            TIMER_A_CTL_MC__CONTINUOUS;
+
+    SCB->SCR &= ~SCB_SCR_SLEEPONEXIT_Msk;   // Wake up on exit from ISR
+
+    // Enable global interrupt
+    __enable_irq();
+
+    NVIC->ISER[0] = 1 << ((TA0_0_IRQn) & 31);
+
     encrypt = PowerMod(HARD_INPUT, varE, varN);
     decrypt = PowerMod(encrypt, varD, varN);
 
@@ -89,14 +101,18 @@ void main(void) {
     printf("Encrypted : %d, Expected : %d\n", encrypt, EXPECTED_OUTPUT);
     printf("Decrypted : %d, Expected : %d\n", decrypt, HARD_INPUT);
 
-//    while(1) {
-//        delayMs(500, freq);
-//        P2->OUT |= BIT1;
-//        encrypt = PowerMod(HARD_INPUT, varE, varN);
-//        // printf("Encrypted : %d, Expected : %d\n", encrypt, EXPECTED_OUTPUT);
-//        P2->OUT &= ~BIT1;
-//        encrypt = 0;
-//        // printf("Reset\n");
-//
-//    }
+    while(1) {
+        __sleep();
+        P2->OUT |= BIT1;
+        encrypt = PowerMod(HARD_INPUT, varE, varN);
+        // printf("Encrypted : %d, Expected : %d\n", encrypt, EXPECTED_OUTPUT);
+        P2->OUT &= ~BIT1;
+        encrypt = 0;
+        TIMER_A0->CCR[0] += 7500;              // Add Offset to TACCR0
+        // printf("Reset\n");
+    }
+}
+
+void TA0_0_IRQHandler(void) {
+    TIMER_A0->CCTL[0] &= ~TIMER_A_CCTLN_CCIFG;
 }
