@@ -8,23 +8,33 @@ from matplotlib import pyplot as plt
 
 def errorFun(wave1, wave2):
 	error = {}
+	wave_len = len(wave1)
 
-	for shift in range(-len(wave1) + 1, len(wave1)):
-		error[shift] = 0
-		overlap = 0
-	#	print("SHIFT HERE: " + str(shift))
-		for i, j in zip(range(len(wave1)), range(shift, len(wave2) + shift)):
-			# print(i,j)
-			if(j < len(wave2) and j >= 0):
-				error[shift] += (wave2[i] - wave1[j]) ** 2
-			#	print('At time', i,j, 'Added ', wave1[i],  wave2[j],' Now ' + str(error[shift]))
-				overlap += 1
-		if(overlap > 0):
+	for shift in range(-wave_len + 1, wave_len):
+
+		# calculating upper and lower bound of shifted waveform
+		lower_end = shift
+		upper_end = lower_end + wave_len - 1
+
+		if (upper_end >= 0 and lower_end < wave_len): # shifted wave contain points in base waveform's domain
+			error[shift] = 0
+			overlap = 0
+
+			# calculating the total error for the shifted waveform
+			if (upper_end < wave_len): # shifted wave inbound while its lower end out of bounds
+				overlap = upper_end + 1
+				for i in range(0, upper_end + 1):
+					j = i - shift
+					error[shift] += pow((wave2[j] - wave1[i]), 2)
+			else: # shifted wave inbound while its upper end out of bounds
+				overlap = wave_len - lower_end + 1
+				for i in range(lower_end, wave_len):
+					j = i - shift
+					error[shift] += pow((wave2[j] - wave1[i]), 2)
+
+			# calculating the mean of the SSE
 			error[shift] = error[shift]/overlap
-		else:
-			error[shift] = math.inf
 
-	#print(error)
 	return error
 
 def main(argv):
