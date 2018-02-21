@@ -10,6 +10,28 @@
  * main.c
  * Only needs imath.c
  */
+
+/* 256 bit - Multiply and squares
+ * M S S S S S S S S S S M S M S S M S M S M S S S M S M S S M S M S M S S M 
+ * S S S M S S M S M S S M S S M S S M S M S M S S S S M S M S S S S S S M S 
+ * M S S S M S M S M S S S S M S M S M S S S S M S M S M S S M S S M S S M S 
+ * S S M S M S S M S S S S S M S M S M S M S M S M S S M S M S M S M S M S S 
+ * S S S M S M S S S S M S M S S M S S M S S M S M S S S M S S S M S M S S S 
+ * M S M S S M S S S S M S M S S S M S S M S M S M S M S M S M S S M S M S S 
+ * S S S M S M S M S M S M S M S S S S M S M S M S M S M S M S M S S M S S M 
+ * S M S M S S S S S M S M S S M S M S S S S S S S M S S S S S S S M S M S M 
+ * S M S M S S S S S S S M S S M S M S M S S M S M S S M S S S M S M S M S M 
+ * S S M S M S M S M S M S M S M S M S S S S M S S S M S S S S S M S S S S M
+ * S M S M S M S M S S M S M S S M S M S S S M S S M S M S S M S S S M S M S 
+ * S S S M S M S M S S S M S M S M S S S M S S M S M S M S S S S M S S M S S 
+ * M S S M S M S S S M S S S S S M S S M S S M S M S S M S M S S M S M S S S 
+ * S M S M S S S S S M S M S S M S S M S S S M S M S S S M S M S S S M S S M 
+ * S S S S S M S M S M S S S M S M S M S S S M S S M S S S S S S S S S M S S 
+ * M S M S S S M S S M S M S M S S S S S S M S M S S S S S M S M S S S M S S 
+ * M S S M S M S S M S S M S M S M S M S M S M S M S M S M S M S S S M S M S 
+ * M S M S S S M S M S M S M S M S M S M S M S M S S S S M S S S S M S M S S 
+ * S M S S S S S S M S S M S S M S M S S M S M S S S M S M S S S M S S S S S 
+ * S M S M S M S M S M S S M S S S M S M S */
 const int freq = FREQ_24_MHz;
 
 void main(void) {
