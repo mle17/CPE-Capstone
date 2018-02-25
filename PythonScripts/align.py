@@ -6,6 +6,12 @@ from scipy import signal
 from sys import argv
 from matplotlib import pyplot as plt
 
+# Only works for similar waveforms and only gets kinda close
+def libFun(wave1, wave2):
+	mid = len(wave1)-1
+	cor = np.correlate(wave1, wave2, 'full')
+	return np.argmax(cor) - mid
+
 def errorFun(wave1, wave2):
 	wave_len = len(wave1)
 
@@ -54,7 +60,9 @@ def main(argv):
 	dx = np.mean(np.diff(x))
 	# shift = (np.argmax(signal.correlate(y1, y2)) - len(y1)) * dx
 	plt.plot(x, y1, x, y2)
-	shift = errorFun(y1, y2) * dx
+	# shift = errorFun(y1, y2) * dx
+	shift = libFun(y1, y2) * dx
+	print(shift)
 	plt.plot(x, y1, x + shift, y2)
 	plt.show()
 
