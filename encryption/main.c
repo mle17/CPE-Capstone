@@ -99,7 +99,6 @@ void main(void) {
     while(1) {
         // printf("LED on\n");
         // __sleep();
-        P2->OUT |= BIT1;
         //delayMs(50, freq);
 //        printf("loop\n");
         //mp_int_zero(&decrypt);
