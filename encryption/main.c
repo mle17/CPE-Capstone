@@ -1,43 +1,21 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "imath.h"
 #include "msp.h"
 #include "delay.h"
-
+#include "imath.h"
 #define BASE    16
 
 /**
  * main.c
  * Only needs imath.c
  */
-
-/* 256 bit - Multiply and squares
- * M S S S S S S S S S S M S M S S M S M S M S S S M S M S S M S M S M S S M 
- * S S S M S S M S M S S M S S M S S M S M S M S S S S M S M S S S S S S M S 
- * M S S S M S M S M S S S S M S M S M S S S S M S M S M S S M S S M S S M S 
- * S S M S M S S M S S S S S M S M S M S M S M S M S S M S M S M S M S M S S 
- * S S S M S M S S S S M S M S S M S S M S S M S M S S S M S S S M S M S S S 
- * M S M S S M S S S S M S M S S S M S S M S M S M S M S M S M S S M S M S S 
- * S S S M S M S M S M S M S M S S S S M S M S M S M S M S M S M S S M S S M 
- * S M S M S S S S S M S M S S M S M S S S S S S S M S S S S S S S M S M S M 
- * S M S M S S S S S S S M S S M S M S M S S M S M S S M S S S M S M S M S M 
- * S S M S M S M S M S M S M S M S M S S S S M S S S M S S S S S M S S S S M
- * S M S M S M S M S S M S M S S M S M S S S M S S M S M S S M S S S M S M S 
- * S S S M S M S M S S S M S M S M S S S M S S M S M S M S S S S M S S M S S 
- * M S S M S M S S S M S S S S S M S S M S S M S M S S M S M S S M S M S S S 
- * S M S M S S S S S M S M S S M S S M S S S M S M S S S M S M S S S M S S M 
- * S S S S S M S M S M S S S M S M S M S S S M S S M S S S S S S S S S M S S 
- * M S M S S S M S S M S M S M S S S S S S M S M S S S S S M S M S S S M S S 
- * M S S M S M S S M S S M S M S M S M S M S M S M S M S M S M S S S M S M S 
- * M S M S S S M S M S M S M S M S M S M S M S M S S S S M S S S S M S M S S 
- * S M S S S S S S M S S M S S M S M S S M S M S S S M S M S S S M S S S S S 
- * S M S M S M S M S M S S M S S S M S M S */
-const int freq = FREQ_24_MHz;
+const int freq = FREQ_6_MHz;
 
 void main(void) {
     WDT_A->CTL = WDT_A_CTL_PW | WDT_A_CTL_HOLD;     // stop watchdog timer
 
     printf("Init\n");
+    // set_DCO(freq);
     set_HFXT();
     printf("HFXT enabled\n");
     //configure_unused_ports();
@@ -122,11 +100,13 @@ void main(void) {
         // printf("LED on\n");
         // __sleep();
         P2->OUT |= BIT1;
+        //delayMs(50, freq);
 //        printf("loop\n");
         //mp_int_zero(&decrypt);
         mp_int_exptmod(&input, &e, &n, &encrypt);
         // mp_int_exptmod(&encrypt, &d, &n, &decrypt);
         P2->OUT &= ~BIT1;
+        delayMs(10, freq);
     }
 }
 

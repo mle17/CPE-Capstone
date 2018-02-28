@@ -15,12 +15,14 @@
 #define FREQ_24_MHz 2400
 #define FREQ_48_MHz 4800
 
-void set_HFXT()
+void set_HFXT() // decrease this and decrease key size to allow for more accurate scope capture (maybe)
+                //also should make sure LED doesnt pull from 3.3v line if tapping out
 {
     /* Enable LDO high-power mode (3V, not DC-DC cause DC-DC has switching noise */
     /* Step 1: Transition to VCORE Level 1: AM0_LDO --> AM1_LDO */
     while ((PCM->CTL1 & PCM_CTL1_PMR_BUSY));
-        PCM->CTL0 = PCM_CTL0_KEY_VAL | PCM_CTL0_AMR__AM_LDO_VCORE1;
+    PCM->CTL0 = PCM_CTL0_KEY_VAL | PCM_CTL0_AMR__AM_LDO_VCORE1;
+    //PCM->CTL0 = PCM_CTL0_KEY_VAL | PCM_CTL0_AMR__AM_DCDC_VCORE1; // this is tapped out. doesnt work
     while ((PCM->CTL1 & PCM_CTL1_PMR_BUSY));
 
     /* Step 2: Configure Flash wait-state to 1 for both banks 0 & 1 */
@@ -41,12 +43,11 @@ void set_HFXT()
 
     /* CS_CTL2_HFXTDRIVE required for HFTX higher than HFTXFREQ */
     CS->CTL2 = CS_CTL2_HFXTFREQ_6 | CS_CTL2_HFXT_EN | CS_CTL2_HFXTDRIVE;
-    CS->CTL2 &= ~CS_CTL2_HFXTBYPASS; /* for readability. don't bypass built-in HFXT crystal */
 
     while(CS->IFG & CS_IFG_HFXTIFG)
         CS->CLRIFG |= CS_CLRIFG_CLR_HFXTIFG;
 
-    CS->CTL1 = CS_CTL1_SELM__HFXTCLK & ~CS_CTL1_DIVM__1; /* set MCLK as output. also need to output to pin to check freq. no division */
+    CS->CTL1 = CS_CTL1_SELM__HFXTCLK | CS_CTL1_DIVM__128; /* set MCLK as output. also need to output to pin to check freq. no division */
     // CS->CLKEN &= ~(CS_CLKEN_HSMCLK_EN | CS_CLKEN_SMCLK_EN); /* disable SMCLK and HSMCLK */
     CS->KEY = 0;
 
