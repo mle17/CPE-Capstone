@@ -53,9 +53,9 @@ void set_HFXT() // decrease this and decrease key size to allow for more accurat
 
     // output MCLK and ACLK on Port4 for verification
     // ACLK - 4.2, MCLK - 4.3
-    P4->DIR |= BIT2 | BIT3;
-    P4->SEL0 |= BIT2 | BIT3;                // Output ACLK & MCLK
-    P4->SEL1 &= ~(BIT2 | BIT3);
+    // P4->DIR |= BIT2 | BIT3;
+    // P4->SEL0 |= BIT2 | BIT3;                // Output ACLK & MCLK
+    // P4->SEL1 &= ~(BIT2 | BIT3);
 }
 
 void configure_unused_ports()
@@ -63,27 +63,36 @@ void configure_unused_ports()
     /* initialize all pins so power isn't wasted on possible floating pins.
      * sets all pins to output mode. output bit is don't care but initialized to 0
      * see section 12.3.2 revision H (Configuration of Unused Ports) for more information
-     */
-    P1->DIR = 0xFF;
-    P1->OUT = 0x00;
-    P2->DIR = 0xFF;
-    P2->OUT = 0x00;
-    P3->DIR = 0xFF;
-    P3->OUT = 0x00;
-    P4->DIR = 0xFF;
-    P4->OUT = 0x00;
-    P5->DIR = 0xFF;
-    P5->OUT = 0x00;
-    P6->DIR = 0xFF;
-    P6->OUT = 0x00;
-    P7->DIR = 0xFF;
-    P7->OUT = 0x00;
-    P8->DIR = 0xFF;
-    P8->OUT = 0x00;
-    P9->DIR = 0xFF;
-    P9->OUT = 0x00;
-    P10->DIR = 0xFF;
-    P10->OUT = 0x00;
+    P1->DIR = 0x00; /* set all as input */
+    P1->REN = 0xFF; /* enable resistor pull up / pull down */
+    P1->OUT = 0x00; /* pull down to ground */
+    P2->DIR = 0x00; /* set all as input */
+    P2->REN = 0xFF; /* enable resistor pull up / pull down */
+    P2->OUT = 0x00; /* pull down to ground */
+    P3->DIR = 0x00; /* set all as input */
+    P3->REN = 0xFF; /* enable resistor pull up / pull down */
+    P3->OUT = 0x00; /* pull down to ground */
+    P4->DIR = 0x00; /* set all as input */
+    P4->REN = 0xFF; /* enable resistor pull up / pull down */
+    P4->OUT = 0x00; /* pull down to ground */
+    P5->DIR = 0x00; /* set all as input */
+    P5->REN = 0xFF; /* enable resistor pull up / pull down */
+    P5->OUT = 0x00; /* pull down to ground */
+    P6->DIR = 0x00; /* set all as input */
+    P6->REN = 0xFF; /* enable resistor pull up / pull down */
+    P6->OUT = 0x00; /* pull down to ground */
+    P7->DIR = 0x00; /* set all as input */
+    P7->REN = 0xFF; /* enable resistor pull up / pull down */
+    P7->OUT = 0x00; /* pull down to ground */
+    P8->DIR = 0x00; /* set all as input */
+    P8->REN = 0xFF; /* enable resistor pull up / pull down */
+    P8->OUT = 0x00; /* pull down to ground */
+    P9->DIR = 0x00; /* set all as input */
+    P9->REN = 0xFF; /* enable resistor pull up / pull down */
+    P9->OUT = 0x00; /* pull down to ground */
+    P10->DIR = 0x00; /* set all as input */
+    P10->REN = 0xFF; /* enable resistor pull up / pull down */
+    P10->OUT = 0x00; /* pull down to ground */
 }
 
 void set_DCO(int f)

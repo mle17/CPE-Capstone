@@ -18,7 +18,7 @@ void main(void) {
     // set_DCO(freq);
     set_HFXT();
     printf("HFXT enabled\n");
-    //configure_unused_ports();
+    configure_unused_ports();
     printf("Disabled unused ports\n");
     /* imath stuff */
     mpz_t  input, e, n, d, encrypt, decrypt;
