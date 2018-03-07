@@ -1,12 +1,13 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QVBoxLayout, QSizePolicy, QMessageBox, QAction, QLineEdit, QWidget, QPushButton
+from PyQt5.QtWidgets import QLabel, QApplication, QMainWindow, QMenu, QVBoxLayout, QSizePolicy, QMessageBox, QAction, QLineEdit, QWidget, QPushButton
 from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import *
 #******************************************************************
 import matplotlib
 matplotlib.use("Qt5Agg")
 #******************************************************************
 from PyQt5 import QtCore
-from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtCore import *
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
@@ -15,7 +16,7 @@ import random
 import DAQ
 #******************************************************************
 
-osc_daq = DAQ.init_osc()
+# osc_daq = DAQ.init_osc()
 overall_df = pd.DataFrame()
 
 def main():
@@ -27,50 +28,62 @@ class App(QMainWindow):
 
     def __init__(self):
         super().__init__()
-        # Panel
+        # Panel setup option
         self.left = 100
         self.top = 100
         self.title = 'Secure Our System'
         self.width = 1440
         self.height = 960
-        self.is_trigger = False
+        self.is_trigger = True
+
         self.m = self.initUI()
 
+    # params 
+    def _initButton(self,button,tooltip,x,y,sizex,sizey):
+        button.setToolTip(tooltip)
+        button.move(x,y)
+        button.resize(sizex,sizey)
+    
+
+
     def initUI(self):
+        # actualy set the panel
         self.setWindowTitle(self.title)
         self.setGeometry(self.left, self.top, self.width, self.height)
 
         # the graph
-        m = PlotCanvas(self, width=10, height=8)
-        m.move(0,0)
+        m = PlotCanvas(self, width=5, height=4)
+        m.move(10,10)
 
         # start button
-        button = QPushButton('Start', self)
-        button.setToolTip('Start Data Recording')
-        button.move(1000,70)
-        button.resize(140,100)
-        button.clicked.connect(self.on_click)
+        self.button_start = QPushButton('Start', self)
+        self._initButton(self.button_start,'Start Recording',550,70,120,50)
+        self.button_start.clicked.connect(self.on_click)
 
         # Create save button
-        self.button_save = QPushButton('Save data', self)
-        self.button_save.setToolTip('Sava data as txt file')
-        self.button_save.move(1000,170)
-        self.button_save.resize(140,100)
+        self.button_save = QPushButton('Export data', self)
+        self._initButton(self.button_save,'Save data as CSV file',550,120,120,50)
+        self.button_save.clicked.connect(self.on_export)
 
-        self.button_toggle = QPushButton('Toggle Mode', self)
-        self.button_toggle.setToolTip('Toggle trigger mode')
-        self.button_toggle.move(1000,370)
-        self.button_toggle.resize(140,100)
+        # Create toggle Button 
+        self.button_toggle = QPushButton('Trigger/Auto', self)
+        self._initButton(self.button_toggle,'Toggle Trigger Mode On and OFF',550,170,120,50)
+        self.button_toggle.clicked.connect(self.on_switch_mode)
 
         # Create textbox
         self.textbox = QLineEdit(self)
-        self.textbox.move(850, 170)
+        self.textbox.move(670, 130)
         self.textbox.resize(140, 20)
         self.textbox.setPlaceholderText('Enter file name here')
+        self.textbox.setText('default');
+        self.label_ext = QLabel(".csv", self);
+        self.label_ext.move(820,125)
 
-        # connect button to function on_click
-        self.button_save.clicked.connect(self.on_save)
-        self.button_toggle.clicked.connect(self.on_switch_mode)
+        self.input_times = QLineEdit(self)
+        self.input_times.move(670, 70)
+        self.input_times.resize(140, 20)
+        self.input_times.setPlaceholderText('X TIMES')
+        self.input_times.setText('1');
 
         self.show()
         return m
@@ -78,16 +91,21 @@ class App(QMainWindow):
     @pyqtSlot()
     def on_click(self):
         print('PyQt5 button click')
-        # put data here
-        wave_data = DAQ.take_waveform(osc_daq, self.is_trigger)
-        global overall_df
-        overall_df = overall_df.append(wave_data)
-        self.m.setData(list(wave_data.iloc[0]))
+        for i in range (int(self.input_times.text())):
+            print('is Trigger' + str(self.is_trigger))
+            global overall_df
+            # wave_data = DAQ.take_waveform(osc_daq, self.is_trigger)
+            placeholder_data = pd.DataFrame([random.random() for i in range(25)])
+            overall_df = overall_df.append(placeholder_data)
+
+            self.m.setData(placeholder_data.iloc[:,0])
+            self.on_export()
+
 
     @pyqtSlot()
-    def on_save(self):
+    def on_export(self):
         print(overall_df)
-        overall_df.to_csv(self.textbox.text())
+        overall_df.to_csv(self.textbox.text() + '.csv')
 
     @pyqtSlot()
     def on_switch_mode(self):
@@ -98,9 +116,7 @@ class App(QMainWindow):
 class PlotCanvas(FigureCanvas):
 
     def __init__(self, parent=None, width=5, height=4, dpi=100):
-        # self.data = [random.random() for i in range(25)]
         fig = Figure(figsize=(width, height), dpi=dpi)
-        self.axes = fig.add_subplot(111)
 
         FigureCanvas.__init__(self, fig)
         self.setParent(parent)
@@ -113,9 +129,9 @@ class PlotCanvas(FigureCanvas):
 
 
     def plot(self, data):
-
-        # data = [random.random() for i in range(25)]
-        ax = self.figure.add_subplot(111)
+        print('data' + str(data))
+        self.figure.clear()
+        ax = self.figure.add_subplot(1,1,1)
         ax.set_title('Waveform')
         self.lines = ax.plot(data, 'r-')
         ax.set_xlabel('Time (ms)')
