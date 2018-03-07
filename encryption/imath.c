@@ -31,10 +31,13 @@
 #endif
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 
 #include <assert.h>
+
+#include "msp.h"
 
 #if DEBUG
 #define STATIC /* public */
@@ -1192,6 +1195,7 @@ mp_result mp_int_exptmod(mp_int a, mp_int b, mp_int m, mp_int c)
 
   if ((res = s_brmu(TEMP(1), m)) != MP_OK) goto CLEANUP;
 
+  P2->OUT |= BIT1;
   if ((res = s_embar(TEMP(0), b, m, TEMP(1), s)) != MP_OK)
     goto CLEANUP;
 
@@ -2772,13 +2776,14 @@ STATIC mp_result s_embar(mp_int a, mp_int b, mp_int m, mp_int mu, mp_int c)
       if (d & 1) {
 	/* The use of a second temporary avoids allocation */
 	UMUL(c, a, TEMP(0));
+  printf("M ");
 	if (!s_reduce(TEMP(0), m, mu, TEMP(1), TEMP(2))) {
 	  res = MP_MEMORY; goto CLEANUP;
 	}
 	mp_int_copy(TEMP(0), c);
       }
 
-
+      printf("S ");
       USQR(a, TEMP(0));
       assert(MP_SIGN(TEMP(0)) == MP_ZPOS);
       if (!s_reduce(TEMP(0), m, mu, TEMP(1), TEMP(2))) {
