@@ -4,22 +4,18 @@ import pandas as pd
 import numpy as np
 import csv
 
-BIT = '1'
+BIT = '0'
 TRIG_VOLT = 3
+BIT_1_THRESH = 100
 
 def main():
    for counter in range(0, 51 if BIT == '0' else 41):
       filename = 'Bit' + BIT + '/scope_' + str(counter) + '.csv'
-      print(filename)
-   # Loop through files
-      # Open current file
-      # Loop through csv
-         # Check when trigger is high, store in array
-      # Output to another csv
+      add_bit_data_to_csv(filename)
 
 def add_bit_data_to_csv(source_file):
     src_csv = pd.read_csv(source_file)
-    result_csv = open('outputBit' + BIT + '.csv', 'w')
+    result_csv = open('outputBit' + BIT + '.csv', 'a')
     wr = csv.writer(result_csv, delimiter=',')
 
     src_vout = list(src_csv["1"])[1:]
@@ -34,11 +30,18 @@ def add_bit_data_to_csv(source_file):
             is_triggered = True
         elif is_triggered and trigger_data < TRIG_VOLT:
             is_triggered = False
-            wr.writerows([bit_data])
+            if BIT == '1':
+                if len(bit_data) > BIT_1_THRESH:
+                    wr.writerows([bit_data])
+            else:
+                if len(bit_data) < BIT_1_THRESH:
+                    wr.writerows([bit_data])
             bit_data = []
 
         if is_triggered:
             bit_data.append(vout_data)
 
+    result_csv.close()
+
 if __name__== "__main__":
-    add_bit_data_to_csv("Bit0/scope_0.csv")
+    main()
