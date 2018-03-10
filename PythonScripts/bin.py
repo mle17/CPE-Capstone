@@ -11,6 +11,7 @@ BIT_1_THRESH = 100
 def main():
    if BIT == '0':
       for counter in range(41, 91):
+         print (counter)
          filename = 'Bit' + BIT + '/scope_' + str(counter) + '.csv'
          add_bit_data_to_csv(filename)
    else:
@@ -50,7 +51,7 @@ def add_bit_data_to_csv(source_file):
 
         if is_triggered:
             bit_data.append(vout_data)
-         else:
+        else:
             delay_data.append(vout_data)
 
     result_csv.close()
