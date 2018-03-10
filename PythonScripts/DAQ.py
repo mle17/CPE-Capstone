@@ -65,7 +65,7 @@ def take_waveform(scope, to_trigger):
       scope.write(":AUTOSCALE")
 
   scope.write(":WAVeform:POINts:MODE RAW")
-  scope.write(":WAVeform:POINts 100")
+  scope.write(":WAVeform:POINts 7680")
   scope.write(":WAVeform:SOURce CHANnel1")
   scope.write(":WAVeform:FORMat ASCII")
 

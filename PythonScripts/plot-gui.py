@@ -16,7 +16,7 @@ import random
 import DAQ
 #******************************************************************
 
-# osc_daq = DAQ.init_osc()
+osc_daq = DAQ.init_osc()
 overall_df = pd.DataFrame()
 
 def main():
@@ -38,12 +38,12 @@ class App(QMainWindow):
 
         self.m = self.initUI()
 
-    # params 
+    # params
     def _initButton(self,button,tooltip,x,y,sizex,sizey):
         button.setToolTip(tooltip)
         button.move(x,y)
         button.resize(sizex,sizey)
-    
+
 
 
     def initUI(self):
@@ -65,7 +65,7 @@ class App(QMainWindow):
         self._initButton(self.button_save,'Save data as CSV file',550,120,120,50)
         self.button_save.clicked.connect(self.on_export)
 
-        # Create toggle Button 
+        # Create toggle Button
         self.button_toggle = QPushButton('Trigger/Auto', self)
         self._initButton(self.button_toggle,'Toggle Trigger Mode On and OFF',550,170,120,50)
         self.button_toggle.clicked.connect(self.on_switch_mode)
@@ -91,12 +91,13 @@ class App(QMainWindow):
     @pyqtSlot()
     def on_click(self):
         print('PyQt5 button click')
-        for i in range (int(self.input_times.text())):
+        for num_capture in range (int(self.input_times.text())):
             print('is Trigger' + str(self.is_trigger))
             global overall_df
-            # wave_data = DAQ.take_waveform(osc_daq, self.is_trigger)
+            wave_data = DAQ.take_waveform(osc_daq, self.is_trigger)
             placeholder_data = pd.DataFrame([random.random() for i in range(25)])
-            overall_df = overall_df.append(placeholder_data)
+            overall_df = overall_df.append(wave_data, ignore_index=True)
+            print("Shape: " + str(overall_df.shape))
 
             self.m.setData(placeholder_data.iloc[:,0])
             self.on_export()
@@ -104,7 +105,6 @@ class App(QMainWindow):
 
     @pyqtSlot()
     def on_export(self):
-        print(overall_df)
         overall_df.to_csv(self.textbox.text() + '.csv')
 
     @pyqtSlot()
@@ -129,7 +129,6 @@ class PlotCanvas(FigureCanvas):
 
 
     def plot(self, data):
-        print('data' + str(data))
         self.figure.clear()
         ax = self.figure.add_subplot(1,1,1)
         ax.set_title('Waveform')
