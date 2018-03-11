@@ -4,26 +4,31 @@ import pandas as pd
 import numpy as np
 import csv
 
-BIT = '0'
+BIT = '1'
 TRIG_VOLT = 3
 BIT_1_THRESH = 100
 
 def main():
+   result_csv = open('outputBit' + BIT + '.csv', 'w')
+   delay_csv = open('delayBit' + BIT + '.csv', 'w')
+
    if BIT == '0':
       for counter in range(41, 91):
-         print (counter)
+         print(counter)
          filename = 'Bit' + BIT + '/scope_' + str(counter) + '.csv'
-         add_bit_data_to_csv(filename)
+         add_bit_data_to_csv(filename, result_csv, delay_csv)
    else:
       for counter in range(0, 41):
+         print(counter)
          filename = 'Bit' + BIT + '/scope_' + str(counter) + '.csv'
-         add_bit_data_to_csv(filename)
+         add_bit_data_to_csv(filename, result_csv, delay_csv)
 
-def add_bit_data_to_csv(source_file):
+   result_csv.close()
+   delay_csv.close()
+
+def add_bit_data_to_csv(source_file, result_csv, delay_csv):
     src_csv = pd.read_csv(source_file)
-    result_csv = open('outputBit' + BIT + '.csv', 'a')
     wr_result = csv.writer(result_csv, delimiter=',')
-    delay_csv = open('delayBit' + BIT + '.csv', 'a')
     wr_delay = csv.writer(delay_csv, delimiter=',')
 
     src_vout = list(src_csv["1"])[1:]
@@ -53,9 +58,6 @@ def add_bit_data_to_csv(source_file):
             bit_data.append(vout_data)
         else:
             delay_data.append(vout_data)
-
-    result_csv.close()
-    delay_csv.close()
 
 if __name__== "__main__":
     main()
