@@ -1,19 +1,6 @@
-/*
- * delay.h
- *
- *  Created on: Apr 12, 2017
- *      Author: Jalfredo
- */
-
 #ifndef DELAY_H_
 #define DELAY_H_
 #include "msp.h"
-#define FREQ_1_5_MHz 150
-#define FREQ_3_MHz 300
-#define FREQ_6_MHz 600
-#define FREQ_12_MHz 1200
-#define FREQ_24_MHz 2400
-#define FREQ_48_MHz 4800
 
 void set_HFXT() // decrease this and decrease key size to allow for more accurate scope capture (maybe)
                 //also should make sure LED doesnt pull from 3.3v line if tapping out
@@ -48,21 +35,14 @@ void set_HFXT() // decrease this and decrease key size to allow for more accurat
         CS->CLRIFG |= CS_CLRIFG_CLR_HFXTIFG;
 
     CS->CTL1 = CS_CTL1_SELM__HFXTCLK | CS_CTL1_DIVM__128; /* set MCLK as output. also need to output to pin to check freq. no division */
-    // CS->CLKEN &= ~(CS_CLKEN_HSMCLK_EN | CS_CLKEN_SMCLK_EN); /* disable SMCLK and HSMCLK */
     CS->KEY = 0;
-
-    // output MCLK and ACLK on Port4 for verification
-    // ACLK - 4.2, MCLK - 4.3
-    // P4->DIR |= BIT2 | BIT3;
-    // P4->SEL0 |= BIT2 | BIT3;                // Output ACLK & MCLK
-    // P4->SEL1 &= ~(BIT2 | BIT3);
 }
 
 void configure_unused_ports()
 {
     /* initialize all pins so power isn't wasted on possible floating pins.
      * sets all pins to output mode. output bit is don't care but initialized to 0
-     * see section 12.3.2 revision H (Configuration of Unused Ports) for more information
+     * see section 12.3.2 revision H (Configuration of Unused Ports) for more information */
     P1->DIR = 0x00; /* set all as input */
     P1->REN = 0xFF; /* enable resistor pull up / pull down */
     P1->OUT = 0x00; /* pull down to ground */
@@ -95,57 +75,12 @@ void configure_unused_ports()
     P10->OUT = 0x00; /* pull down to ground */
 }
 
-void set_DCO(int f)
-{
-    CS->KEY = CS_KEY_VAL;
-    CS->CTL0 = 0;
-
-    /* set the clock freq */
-    switch(f)
-    {
-        case FREQ_1_5_MHz:
-            CS->CTL0 = CS_CTL0_DCORSEL_0;
-            break;
-        case FREQ_3_MHz:
-            CS->CTL0 = CS_CTL0_DCORSEL_1;
-            break;
-        case FREQ_6_MHz:
-            CS->CTL0 = CS_CTL0_DCORSEL_2;
-            break;
-        case FREQ_12_MHz:
-            CS->CTL0 = CS_CTL0_DCORSEL_3;
-            break;
-        case FREQ_24_MHz:
-            CS->CTL0 = CS_CTL0_DCORSEL_4;
-            break;
-        case FREQ_48_MHz:
-            CS->CTL0 = CS_CTL0_DCORSEL_5;
-            break;
-        default:
-            CS->CTL0 = CS_CTL0_DCORSEL_1;
-    }
-
-    CS->CTL1 = CS_CTL1_SELA_2 | CS_CTL1_SELS_3 | CS_CTL1_SELM_3;
-    CS->KEY = 0;
-}
-/* delay milliseconds when system clock is at 3 MHz for Rev C MCU */
+/* Arbitrary busy delay function recycled from previous projects */
 void delayMs(int n,int f) {
     int i, j;
 
     for (j = 0; j < n; j++)
-        for (i = f; i > 0; i--);      /* Delay 1 ms*/
+        for (i = f; i > 0; i--);
 }
-
-void delayNs(int n,int f) {
-    n /= 10000; /* assuming minimal input is 10000ns as lower input will be impossible*/
-    f /= 100;   /* faster than 10us which too close to max speed of 1us with 24Mhz clock speed */
-    int j,i;
-
-    for (j = 0; j < n; j++)
-        for (i = f; i > 0; i--);      /* Delay 1 ns-ish */
-    /* delay 1ns */
-}
-
-
 
 #endif /* DELAY_H_ */
