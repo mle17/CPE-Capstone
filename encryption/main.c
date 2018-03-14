@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "msp.h"
-#include "imath.h"
+#include "imath.h" // https://github.com/creachadair/imath
 #define BASE    16
 
 void printNum(mpz_t num);
